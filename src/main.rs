@@ -1,7 +1,19 @@
 #![no_std]
 #![no_main]
 
+use arduino_hal::hal::port::PB5;
+use arduino_hal::port::{mode::Output, Pin};
 use panic_halt as _;
+
+fn blink_code(d13: &mut Pin<Output, PB5>, n: usize) {
+    for _ in 0..n {
+        d13.toggle();
+        arduino_hal::delay_ms(175);
+        d13.toggle();
+        arduino_hal::delay_ms(175);
+    }
+    arduino_hal::delay_ms(1000);
+}
 
 #[arduino_hal::entry]
 fn main() -> ! {
@@ -21,7 +33,6 @@ fn main() -> ! {
     let mut led = pins.d13.into_output();
 
     loop {
-        led.toggle();
-        arduino_hal::delay_ms(2000);
+        blink_code(&mut led, 3);
     }
 }
