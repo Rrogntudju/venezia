@@ -23,7 +23,9 @@ fn main() -> ! {
     loop {
         let lecture = voltmètre.analog_read(&mut adc);
         if lecture > seuil {
-            ufmt::uwriteln!(&mut serial, "Lecture: {}\r", lecture).void_unwrap();
+            if led.is_set_low() {
+                ufmt::uwriteln!(&mut serial, "Lecture: {}\r", lecture).void_unwrap();
+            }
             led.set_high();
             délai = délai.saturating_sub(1);
             if délai == 0 {
