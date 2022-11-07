@@ -9,7 +9,7 @@ fn main() -> ! {
     let dp = arduino_hal::Peripherals::take().unwrap();
     let pins = arduino_hal::pins!(dp);
 
-    let mut crydom = pins.d12.into_output_high();   // Brancher l'alimentation
+    let mut crydom = pins.d12.into_output_high(); // Brancher l'alimentation
     let mut adc = arduino_hal::Adc::new(dp.ADC, Default::default());
     let voltmètre = pins.a0.into_analog_input(&mut adc);
     let mut led = pins.d13.into_output();
@@ -18,7 +18,7 @@ fn main() -> ! {
     arduino_hal::delay_ms(100);
     let seuil = (voltmètre.analog_read(&mut adc) + 10).clamp(0, 1023);
     ufmt::uwriteln!(&mut serial, "Seuil: {}\r", seuil).void_unwrap();
-    let mut délai: u16 = 3600;
+    let mut délai: u16 = 3600; // Une heure de fonctionnement
 
     loop {
         let lecture = voltmètre.analog_read(&mut adc);
@@ -29,9 +29,8 @@ fn main() -> ! {
             led.set_high();
             délai = délai.saturating_sub(1);
             if délai == 0 {
-                crydom.set_low();   // Couper l'alimentation après une heure de fonctionnement
+                crydom.set_low(); // Couper l'alimentation
             }
-
         } else {
             led.set_low();
             délai = 3600;
@@ -39,5 +38,4 @@ fn main() -> ! {
         }
         arduino_hal::delay_ms(1000);
     }
-
 }
