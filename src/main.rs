@@ -19,10 +19,13 @@ fn clignote_code(led: &mut Pin<Output, PB5>, n: usize) {
 fn main() -> ! {
     let dp = arduino_hal::Peripherals::take().unwrap();
     let pins = arduino_hal::pins!(dp);
-
+    let mut adc = arduino_hal::Adc::new(dp.ADC, Default::default());
     let mut led = pins.d13.into_output();
+    let galvanomètre = pins.a0.into_analog_input(&mut adc);
+    let crydom = pins.d12.into_output_high();   // Crydom à ON
 
     loop {
+        let voltage = galvanomètre.analog_read(&mut adc);
         clignote_code(&mut led, 3);
     }
 }
