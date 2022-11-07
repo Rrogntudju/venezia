@@ -18,7 +18,7 @@ fn main() -> ! {
     arduino_hal::delay_ms(100);
     let seuil = (voltmètre.analog_read(&mut adc) + 10).clamp(0, 1023);
     ufmt::uwriteln!(&mut serial, "Seuil: {}\r", seuil).void_unwrap();
-    let mut délai = 3600_u16;
+    let mut délai: u16 = 3600;
 
     loop {
         arduino_hal::delay_ms(200);
