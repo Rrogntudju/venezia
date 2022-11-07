@@ -21,7 +21,6 @@ fn main() -> ! {
     let mut délai: u16 = 3600;
 
     loop {
-        arduino_hal::delay_ms(200);
         let lecture = voltmètre.analog_read(&mut adc);
         if lecture > seuil {
             led.set_high();
@@ -35,7 +34,7 @@ fn main() -> ! {
             délai = 3600;
             crydom.set_high();
         }
-        arduino_hal::delay_ms(800);
+        arduino_hal::delay_ms(1000);
     }
 
 }
