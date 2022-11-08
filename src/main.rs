@@ -30,6 +30,9 @@ fn main() -> ! {
             délai = délai.saturating_sub(1);
             if délai == 0 {
                 crydom.set_low(); // Couper l'alimentation
+                loop {
+                    arduino_hal::delay_ms(1000);
+                }
             }
         } else {
             led.set_low();
