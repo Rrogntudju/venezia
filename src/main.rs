@@ -15,7 +15,7 @@ fn main() -> ! {
     let mut led = pins.d13.into_output();
     let mut serial = arduino_hal::default_serial!(dp, pins, 57600);
 
-    arduino_hal::delay_ms(100);
+    arduino_hal::delay_ms(250); // Délai pour constante de temps RC
     let seuil = (voltmètre.analog_read(&mut adc) + 10).clamp(0, 1023);
     ufmt::uwriteln!(&mut serial, "Seuil: {}\r", seuil).void_unwrap();
     let mut délai: u16 = 3600; // Une heure de fonctionnement
