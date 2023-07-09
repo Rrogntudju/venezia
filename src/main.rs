@@ -24,18 +24,26 @@ fn main() -> ! {
 
     arduino_hal::delay_ms(250); // Délai pour constante de temps RC
     let init = voltmètre.analog_read(&mut adc);
-    ufmt::uwriteln!(&mut serial, "Seuil: {}\rLecture initiale: {}\r", SEUIL, init).void_unwrap();
+    ufmt::uwriteln!(
+        &mut serial,
+        "Seuil: {}\rLecture initiale: {}\r",
+        SEUIL,
+        init
+    )
+    .void_unwrap();
     if init > SEUIL {
-        fin(&mut led);  // La lecture initiale est haute : la cafetière est déjà à ON
+        fin(&mut led); // La lecture initiale est haute : la cafetière est déjà à ON
     }
     let mut délai: u16 = if test.is_high() { DELAI } else { DELAI_TEST };
+    let mut prec: u16 = 0;
 
     loop {
         let lecture = voltmètre.analog_read(&mut adc);
+        if lecture != prec {
+            ufmt::uwriteln!(&mut serial, "Lecture: {}\r", lecture).void_unwrap();
+            prec = lecture;
+        }
         if lecture > SEUIL {
-            if led.is_set_low() {
-                ufmt::uwriteln!(&mut serial, "Lecture haute: {}\r", lecture).void_unwrap();
-            }
             led.set_high();
             délai = délai.saturating_sub(1);
             if délai == 0 {
