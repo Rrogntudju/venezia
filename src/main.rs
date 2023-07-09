@@ -27,7 +27,7 @@ fn main() -> ! {
     ufmt::uwriteln!(&mut serial, "Seuil: {}\r", SEUIL).void_unwrap();
     ufmt::uwriteln!(&mut serial, "Lecture initiale: {}\r", init).void_unwrap();
     if init > SEUIL {
-        fin(&mut led);  // La cafetière est déjà à ON
+        fin(&mut led);  // La lecture initiale est haute : la cafetière est déjà à ON
     }
     let mut délai: u16 = if test.is_high() { DELAI } else { DELAI_TEST };
 
@@ -35,12 +35,13 @@ fn main() -> ! {
         let lecture = voltmètre.analog_read(&mut adc);
         if lecture > SEUIL {
             if led.is_set_low() {
-                ufmt::uwriteln!(&mut serial, "Lecture: {}\r", lecture).void_unwrap();
+                ufmt::uwriteln!(&mut serial, "Lecture haute: {}\r", lecture).void_unwrap();
             }
             led.set_high();
             délai = délai.saturating_sub(1);
             if délai == 0 {
                 crydom.set_low(); // Couper l'alimentation
+                ufmt::uwriteln!(&mut serial, "Délai expiré").void_unwrap();
                 fin(&mut led);
             }
         } else {
