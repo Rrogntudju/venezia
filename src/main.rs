@@ -34,10 +34,7 @@ fn main() -> ! {
             délai = délai.saturating_sub(1);
             if délai == 0 {
                 crydom.set_low(); // Couper l'alimentation
-                loop {
-                    led.toggle();
-                    arduino_hal::delay_ms(250);
-                }
+                fin(&mut led);
             }
         } else {
             led.set_low();
@@ -45,5 +42,17 @@ fn main() -> ! {
             crydom.set_high();
         }
         arduino_hal::delay_ms(1000);
+    }
+}
+
+use arduino_hal::port::mode::Output;
+use arduino_hal::port::{Pin, PinOps};
+fn fin<PB5>(led: &mut Pin<Output, PB5>)
+where
+    PB5: PinOps,
+{
+    loop {
+        led.toggle();
+        arduino_hal::delay_ms(250);
     }
 }
