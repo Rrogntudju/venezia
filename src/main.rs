@@ -1,13 +1,14 @@
 #![no_std]
 #![no_main]
 
-use arduino_hal::prelude::*;
 use arduino_hal::port::mode::Output;
 use arduino_hal::port::{Pin, PinOps};
+use arduino_hal::prelude::*;
 use panic_halt as _;
 
 const DELAI: u16 = 3600; // Une heure de fonctionnement
 const DELAI_TEST: u16 = 10;
+const SEUIL: u16 = 1; // Lecture au-dessus de laquelle la cafetière est considérée à ON
 
 #[arduino_hal::entry]
 fn main() -> ! {
@@ -22,13 +23,16 @@ fn main() -> ! {
     let mut serial = arduino_hal::default_serial!(dp, pins, 57600);
 
     arduino_hal::delay_ms(250); // Délai pour constante de temps RC
-    let seuil = (voltmètre.analog_read(&mut adc) + 30).clamp(0, 1023);
-    ufmt::uwriteln!(&mut serial, "Seuil: {}\r", seuil).void_unwrap();
+    let init = (voltmètre.analog_read(&mut adc) + 30).clamp(0, 1023);
+    ufmt::uwriteln!(&mut serial, "Lecture initiale: {}\r", init).void_unwrap();
+    if init > SEUIL {
+        fin(&mut led);  // La cafetière est déjà à ON
+    }
     let mut délai: u16 = if test.is_high() { DELAI } else { DELAI_TEST };
 
     loop {
         let lecture = voltmètre.analog_read(&mut adc);
-        if lecture > seuil {
+        if lecture > SEUIL {
             if led.is_set_low() {
                 ufmt::uwriteln!(&mut serial, "Lecture: {}\r", lecture).void_unwrap();
             }
@@ -47,7 +51,7 @@ fn main() -> ! {
     }
 }
 
-fn fin<PB5>(led: &mut Pin<Output, PB5>)
+fn fin<PB5>(led: &mut Pin<Output, PB5>) -> !
 where
     PB5: PinOps,
 {
