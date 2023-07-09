@@ -31,6 +31,7 @@ fn main() -> ! {
         init
     )
     .void_unwrap();
+
     if init > SEUIL {
         fin(&mut led); // La lecture initiale est haute : la cafetière est déjà à ON
     }
