@@ -2,6 +2,8 @@
 #![no_main]
 
 use arduino_hal::prelude::*;
+use arduino_hal::port::mode::Output;
+use arduino_hal::port::{Pin, PinOps};
 use panic_halt as _;
 
 const DELAI: u16 = 3600; // Une heure de fonctionnement
@@ -45,8 +47,6 @@ fn main() -> ! {
     }
 }
 
-use arduino_hal::port::mode::Output;
-use arduino_hal::port::{Pin, PinOps};
 fn fin<PB5>(led: &mut Pin<Output, PB5>)
 where
     PB5: PinOps,
