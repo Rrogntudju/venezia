@@ -23,7 +23,7 @@ fn main() -> ! {
     let mut serial = arduino_hal::default_serial!(dp, pins, 57600);
 
     arduino_hal::delay_ms(250); // Délai pour constante de temps RC
-    let init = (voltmètre.analog_read(&mut adc) + 30).clamp(0, 1023);
+    let init = voltmètre.analog_read(&mut adc);
     ufmt::uwriteln!(&mut serial, "Lecture initiale: {}\r", init).void_unwrap();
     if init > SEUIL {
         fin(&mut led);  // La cafetière est déjà à ON
