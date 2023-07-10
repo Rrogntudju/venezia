@@ -32,6 +32,7 @@ fn main() -> ! {
     }
 
     let mut délai: u16 = if test.is_high() { DELAI } else { DELAI_TEST };
+    ufmt::uwriteln!(&mut serial, "Délai: {}\r", délai).void_unwrap();
     let mut prec: u16 = 0;
 
     loop {
