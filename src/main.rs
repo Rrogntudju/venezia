@@ -35,6 +35,7 @@ fn main() -> ! {
     if init > SEUIL {
         fin(&mut led); // La lecture initiale est haute : la cafetière est déjà à ON
     }
+    
     let mut délai: u16 = if test.is_high() { DELAI } else { DELAI_TEST };
     let mut prec: u16 = 0;
 
