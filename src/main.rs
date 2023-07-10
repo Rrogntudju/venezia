@@ -8,7 +8,7 @@ use panic_halt as _;
 
 const DELAI: u16 = 3600; // Une heure de fonctionnement
 const DELAI_TEST: u16 = 10;
-const SEUIL: u16 = 1; // Lecture au-dessus de laquelle la cafetière est considérée à ON
+const SEUIL: u16 = 0; // Seuil de lecture au-dessus duquel la cafetière est considérée à ON
 
 #[arduino_hal::entry]
 fn main() -> ! {
@@ -35,7 +35,7 @@ fn main() -> ! {
     if init > SEUIL {
         fin(&mut led); // La lecture initiale est haute : la cafetière est déjà à ON
     }
-    
+
     let mut délai: u16 = if test.is_high() { DELAI } else { DELAI_TEST };
     let mut prec: u16 = 0;
 
