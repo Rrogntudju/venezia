@@ -3,6 +3,7 @@
 
 use arduino_hal::port::mode::Output;
 use arduino_hal::port::{Pin, PinOps};
+#[cfg(debug_assertions)]
 use arduino_hal::prelude::*;
 use panic_halt as _;
 
@@ -14,12 +15,12 @@ const SEUIL: u16 = 30; // Seuil de lecture au-dessus duquel la cafetière est co
 fn main() -> ! {
     let dp = arduino_hal::Peripherals::take().unwrap();
     let pins = arduino_hal::pins!(dp);
-
     let mut crydom = pins.d12.into_output_high(); // Brancher l'alimentation
     let test = pins.d8.into_pull_up_input();
     let mut adc = arduino_hal::Adc::new(dp.ADC, Default::default());
     let voltmètre = pins.a0.into_analog_input(&mut adc);
     let mut led = pins.d13.into_output();
+    #[cfg(debug_assertions)]
     let mut serial = arduino_hal::default_serial!(dp, pins, 57600);
 
     arduino_hal::delay_ms(250); // Délai pour constante de temps RC
@@ -33,10 +34,12 @@ fn main() -> ! {
     if init > SEUIL {
         #[cfg(debug_assertions)]
         ufmt::uwriteln!(&mut serial, "Lecture initiale > SEUIL").void_unwrap();
+
         fin(&mut led); // La lecture initiale est haute : la cafetière est déjà à ON
     }
 
     let mut délai: u16 = if test.is_high() { DELAI } else { DELAI_TEST };
+    #[cfg(debug_assertions)]
     ufmt::uwriteln!(&mut serial, "Délai: {}\r", délai).void_unwrap();
 
     loop {
@@ -51,6 +54,7 @@ fn main() -> ! {
                 crydom.set_low(); // Couper l'alimentation
                 #[cfg(debug_assertions)]
                 ufmt::uwriteln!(&mut serial, "Délai expiré").void_unwrap();
+
                 fin(&mut led);
             }
         } else {
