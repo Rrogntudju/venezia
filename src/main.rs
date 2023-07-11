@@ -52,10 +52,10 @@ fn main() -> ! {
             led.set_high();
             délai = délai.saturating_sub(1);
             if délai == 0 {
-                crydom.set_low(); // Couper l'alimentation
                 #[cfg(debug_assertions)]
                 ufmt::uwriteln!(&mut serial, "Délai expiré").void_unwrap();
-
+                
+                crydom.set_low(); // Couper l'alimentation
                 fin(&mut led);
             }
         } else {
