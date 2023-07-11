@@ -8,7 +8,7 @@ use panic_halt as _;
 
 const DELAI: u16 = 3600; // Une heure de fonctionnement
 const DELAI_TEST: u16 = 10;
-const SEUIL: u16 = 0; // Seuil de lecture au-dessus duquel la cafetière est considérée à ON
+const SEUIL: u16 = 30; // Seuil de lecture au-dessus duquel la cafetière est considérée à ON
 
 #[arduino_hal::entry]
 fn main() -> ! {
@@ -24,28 +24,32 @@ fn main() -> ! {
 
     arduino_hal::delay_ms(250); // Délai pour constante de temps RC
     let init = voltmètre.analog_read(&mut adc);
-    ufmt::uwriteln!(&mut serial, "Seuil: {}\r", SEUIL).void_unwrap();
-    ufmt::uwriteln!(&mut serial, "Lecture initiale: {}\r", init).void_unwrap();
+    #[cfg(debug_assertions)]
+    {
+        ufmt::uwriteln!(&mut serial, "Seuil: {}\r", SEUIL).void_unwrap();
+        ufmt::uwriteln!(&mut serial, "Lecture initiale: {}\r", init).void_unwrap();
+    }
 
     if init > SEUIL {
+        #[cfg(debug_assertions)]
+        ufmt::uwriteln!(&mut serial, "Lecture initiale > SEUIL").void_unwrap();
         fin(&mut led); // La lecture initiale est haute : la cafetière est déjà à ON
     }
 
     let mut délai: u16 = if test.is_high() { DELAI } else { DELAI_TEST };
     ufmt::uwriteln!(&mut serial, "Délai: {}\r", délai).void_unwrap();
-    let mut prec: u16 = 0;
 
     loop {
         let lecture = voltmètre.analog_read(&mut adc);
-        if lecture != prec {
-            ufmt::uwriteln!(&mut serial, "Lecture: {}\r", lecture).void_unwrap();
-            prec = lecture;
-        }
+        #[cfg(debug_assertions)]
+        ufmt::uwriteln!(&mut serial, "Lecture: {}\r", lecture).void_unwrap();
+
         if lecture > SEUIL {
             led.set_high();
             délai = délai.saturating_sub(1);
             if délai == 0 {
                 crydom.set_low(); // Couper l'alimentation
+                #[cfg(debug_assertions)]
                 ufmt::uwriteln!(&mut serial, "Délai expiré").void_unwrap();
                 fin(&mut led);
             }
