@@ -23,7 +23,7 @@ fn main() -> ! {
     #[cfg(debug_assertions)]
     let mut serial = arduino_hal::default_serial!(dp, pins, 57600);
 
-    arduino_hal::delay_ms(250); // Délai pour constante de temps RC
+    arduino_hal::delay_ms(250); // Délai pour lecture initiale maximale
     let init = voltmètre.analog_read(&mut adc);
     #[cfg(debug_assertions)]
     {
@@ -35,6 +35,7 @@ fn main() -> ! {
         #[cfg(debug_assertions)]
         ufmt::uwriteln!(&mut serial, "Lecture initiale > SEUIL").void_unwrap();
 
+        crydom.set_low(); // Couper l'alimentation
         fin(&mut led); // La lecture initiale est haute : la cafetière est déjà à ON
     }
 
