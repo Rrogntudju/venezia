@@ -54,14 +54,13 @@ fn main() -> ! {
             if délai == 0 {
                 #[cfg(debug_assertions)]
                 ufmt::uwriteln!(&mut serial, "Délai expiré").void_unwrap();
-                
+
                 crydom.set_low(); // Couper l'alimentation
                 fin(&mut led);
             }
         } else {
             led.set_low();
             délai = if test.is_high() { DELAI } else { DELAI_TEST };
-            crydom.set_high();
         }
         arduino_hal::delay_ms(1000);
     }
