@@ -3,8 +3,6 @@
 
 use arduino_hal::port::mode::Output;
 use arduino_hal::port::{Pin, PinOps};
-#[cfg(debug_assertions)]
-use arduino_hal::prelude::*;
 use panic_halt as _;
 
 const DELAI: u16 = 3600; // Une heure de fonctionnement
@@ -27,13 +25,13 @@ fn main() -> ! {
     let init = voltmètre.analog_read(&mut adc);
     #[cfg(debug_assertions)]
     {
-        ufmt::uwriteln!(&mut serial, "Seuil: {}\r", SEUIL).void_unwrap();
-        ufmt::uwriteln!(&mut serial, "Lecture initiale: {}\r", init).void_unwrap();
+        ufmt::uwriteln!(&mut serial, "Seuil: {}\r", SEUIL).unwrap();
+        ufmt::uwriteln!(&mut serial, "Lecture initiale: {}\r", init).unwrap();
     }
 
     if init > SEUIL {
         #[cfg(debug_assertions)]
-        ufmt::uwriteln!(&mut serial, "Lecture initiale > SEUIL").void_unwrap();
+        ufmt::uwriteln!(&mut serial, "Lecture initiale > SEUIL").unwrap();
 
         crydom.set_low(); // Couper l'alimentation
         fin(&mut led); // La lecture initiale est haute : la cafetière est déjà à ON
@@ -41,19 +39,19 @@ fn main() -> ! {
 
     let mut délai: u16 = if test.is_high() { DELAI } else { DELAI_TEST };
     #[cfg(debug_assertions)]
-    ufmt::uwriteln!(&mut serial, "Délai: {}\r", délai).void_unwrap();
+    ufmt::uwriteln!(&mut serial, "Délai: {}\r", délai).unwrap();
 
     loop {
         let lecture = voltmètre.analog_read(&mut adc);
         #[cfg(debug_assertions)]
-        ufmt::uwriteln!(&mut serial, "Lecture: {}\r", lecture).void_unwrap();
+        ufmt::uwriteln!(&mut serial, "Lecture: {}\r", lecture).unwrap();
 
         if lecture > SEUIL {
             led.set_high();
             délai = délai.saturating_sub(1);
             if délai == 0 {
                 #[cfg(debug_assertions)]
-                ufmt::uwriteln!(&mut serial, "Délai expiré").void_unwrap();
+                ufmt::uwriteln!(&mut serial, "Délai expiré").unwrap();
 
                 crydom.set_low(); // Couper l'alimentation
                 fin(&mut led);
